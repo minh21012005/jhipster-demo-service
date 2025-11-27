@@ -5,6 +5,7 @@ import com.mycompany.myapp.domain.Role;
 import com.mycompany.myapp.domain.dto.CreateUserRequest;
 import com.mycompany.myapp.repository.AuthUserRepository;
 import com.mycompany.myapp.repository.RoleRepository;
+import com.mycompany.myapp.web.rest.errors.IdInvalidException;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,11 @@ public class AuthUserService {
         return authUserRepository.findByEmailWithRole(email);
     }
 
-    public void handleCreateUser(CreateUserRequest createUserRequest) throws Exception {
+    public void handleCreateUser(CreateUserRequest createUserRequest) throws IdInvalidException {
         AuthUser user = new AuthUser();
         user.setEmail(createUserRequest.getEmail());
         user.setPassword(createUserRequest.getPassword());
-        Role role = this.roleRepository.findByCode("USER").orElseThrow(() -> new Exception("error"));
+        Role role = this.roleRepository.findByCode("USER").orElseThrow(() -> new IdInvalidException("error"));
         user.setRole(role);
         authUserRepository.save(user);
     }
