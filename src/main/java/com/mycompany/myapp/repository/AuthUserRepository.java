@@ -10,10 +10,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AuthUserRepository extends JpaRepository<AuthUser, UUID> {
-    Optional<AuthUser> findByEmail(String email);
-    Optional<AuthUser> findByRefreshTokenAndEmail(String token, String email);
-    boolean existsByEmail(String email);
-
     @Query("SELECT u FROM AuthUser u JOIN FETCH u.role WHERE u.email = :email")
     Optional<AuthUser> findByEmailWithRole(@Param("email") String email);
+
+    @Query("SELECT u FROM AuthUser u JOIN FETCH u.role WHERE u.id = :id")
+    Optional<AuthUser> findByIdWithRole(@Param("id") UUID id);
 }

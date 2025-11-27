@@ -6,6 +6,7 @@ import com.mycompany.myapp.domain.dto.CreateUserRequest;
 import com.mycompany.myapp.repository.AuthUserRepository;
 import com.mycompany.myapp.repository.RoleRepository;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,5 +31,9 @@ public class AuthUserService {
         Role role = this.roleRepository.findByCode("USER").orElseThrow(() -> new Exception("error"));
         user.setRole(role);
         authUserRepository.save(user);
+    }
+
+    public Optional<AuthUser> findById(UUID id) {
+        return authUserRepository.findByIdWithRole(id);
     }
 }

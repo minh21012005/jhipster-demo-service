@@ -8,6 +8,7 @@ import com.mycompany.myapp.domain.dto.RoleDTO;
 import com.mycompany.myapp.service.AuthUserService;
 import com.mycompany.myapp.util.JwtUtil;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -95,5 +96,27 @@ public class AuthController {
             .build();
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, resCookies.toString()).body(res);
+    }
+
+    @GetMapping("/account")
+    public ResponseEntity<ResLoginDTO.UserGetAccount> getAccount(Authentication authentication) throws Exception {
+        AuthUser currentUserDB =
+            this.authUserService.findById(UUID.fromString(authentication.getName())).orElseThrow(() -> new Exception("User không tồn tại"));
+
+        ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin();
+        ResLoginDTO.UserGetAccount userGetAccount = new ResLoginDTO.UserGetAccount();
+
+        if (currentUserDB != null) {
+            RoleDTO roleDTO = new RoleDTO();
+            roleDTO.setId(currentUserDB.getRole().getId());
+            roleDTO.setName(currentUserDB.getRole().getCode());
+
+            userLogin.setId(currentUserDB.getId());
+            userLogin.setEmail(currentUserDB.getEmail());
+            userLogin.setRole(roleDTO);
+            userGetAccount.setUser(userLogin);
+        }
+
+        return ResponseEntity.ok().body(userGetAccount);
     }
 }
