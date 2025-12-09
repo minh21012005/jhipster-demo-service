@@ -28,8 +28,16 @@ import tech.jhipster.config.JHipsterProperties;
 public class SecurityConfiguration {
 
     private final JHipsterProperties jHipsterProperties;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    public SecurityConfiguration(JHipsterProperties jHipsterProperties) {
+    public SecurityConfiguration(
+        JHipsterProperties jHipsterProperties,
+        CustomOAuth2UserService customOAuth2UserService,
+        OAuth2SuccessHandler oAuth2SuccessHandler
+    ) {
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
         this.jHipsterProperties = jHipsterProperties;
     }
 
@@ -58,6 +66,9 @@ public class SecurityConfiguration {
                 exceptions
                     .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
                     .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
+            )
+            .oauth2Login(oauth2 ->
+                oauth2.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)).successHandler(oAuth2SuccessHandler)
             )
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
         return http.build();

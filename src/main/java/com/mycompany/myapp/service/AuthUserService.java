@@ -37,4 +37,28 @@ public class AuthUserService {
     public Optional<AuthUser> findById(UUID id) {
         return authUserRepository.findByIdWithRole(id);
     }
+
+    public AuthUser registerOAuthUser(String email) {
+        // Kiểm tra nếu user đã tồn tại
+        Optional<AuthUser> existingUser = authUserRepository.findByEmailWithRole(email);
+        if (existingUser.isPresent()) {
+            return existingUser.get();
+        }
+
+        AuthUser user = new AuthUser();
+        user.setEmail(email);
+
+        // Không cần password, hoặc có thể generate ngẫu nhiên
+        user.setPassword(UUID.randomUUID().toString());
+
+        // Gán role mặc định
+        Role role = roleRepository.findByCode("USER").orElseThrow(() -> new RuntimeException("Role USER không tồn tại"));
+        user.setRole(role);
+
+        // User OAuth mặc định enable = true
+        user.setEnabled(true);
+
+        // Lưu vào DB
+        return authUserRepository.save(user);
+    }
 }
